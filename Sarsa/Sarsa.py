@@ -40,12 +40,15 @@ class RL(object):
 class SarsaTable(RL):
 
     def __init__(self, actions, learning_rate=0.01, reward_decay=0.9, e_greedy=0.9):
+        # super函数是用用来解决多重继承问题的，直接用类名调用父类方法在使用单继承的时候没问题，但是如果使用多继承，会涉及到查找顺序（MRO）、重复调用（钻石继承）等种种问题。总之前人留下的经验就是：保持一致性。要不全部用类名调用父类，要不就全部用 super，不要一半一半。
+        # 用法如下super(本类名, self).__init__()
         super(SarsaTable, self).__init__(actions, learning_rate, reward_decay, e_greedy)
 
     def learn(self, s, a, r, s_, a_):
         self.check_state_exist(s_)
         q_predict = self.q_table.loc[s, a]
         if(s_ != 'terminal'):
+            # 选择采取下一个行动的state和action
             q_target = r + self.gamma * self.q_table.loc[s_, a_] # next state is not terminal
         else:
             q_target = r # next state is terminal
