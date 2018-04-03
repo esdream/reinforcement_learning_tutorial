@@ -1,14 +1,18 @@
 from maze_env import Maze
-from Sarsa import SarsaTable
+from RL_brain import SarsaLambdaTable
 
 def update():
     for episode in range(100):
         # initial observation
         observation = env.reset()
 
+
         # Sarsa根据state观测选择行为
         # Sarsa的action是在每一次探索之前选的
         action = RL.choose_action(str(observation))
+
+        # 如果使用的是sarsa lambda方法，新回合要清零eligibility trace
+        RL.eligibility_trace *= 0
 
         while True:
             #fresh env
@@ -39,7 +43,7 @@ def update():
 
 if(__name__ == '__main__'):
     env = Maze()
-    RL = SarsaTable(actions=list(range(env.n_actions)))
+    RL = SarsaLambdaTable(actions=list(range(env.n_actions)))
 
     env.after(100, update)
     env.mainloop()
