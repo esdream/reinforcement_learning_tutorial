@@ -87,10 +87,10 @@ class SarsaLambdaTable(RL):
         error = q_target - q_predict
 
         # 对于经历过的state-action, 我们让他+1, 证明它是得到reward路途中不可或缺的一环
-        # Method 1:
+        # Method 1: accumulating trace, eligibility trace没有封顶，可以一直往上加
         # self.eligibility.loc[s, a] += 1
 
-        # Method 2:
+        # Method 2: replacing trace
         self.eligibility_trace.loc[s, :] *= 0
         self.eligibility_trace.loc[s, a] = 1
 
