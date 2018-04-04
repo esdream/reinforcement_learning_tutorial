@@ -91,3 +91,31 @@ class DeepQNetwork:
         with tf.variable_scope('target_net'):
             # c_names(collections_names) are the collections to store variables
             c_names = ['target_net_params', tf.GraphKeys.GLOBAL_VARIABLES]
+
+            # 第一层,c_names(collections_names)在更新target_net参数时会用到
+            with tf.variable_scope('l1'):
+                w1 = tf.get_variable('w1', [self.n_features, n_l1], initializer=w_initializer, collections=c_names)
+                b1 = tf.get_variable('b1', [1, n_l1], initializer=b_initializer, collections=c_names)
+                l1 = tf.nn.relu(tf.matmul(self.s_, w1) + b1)
+            
+            # 第一层,c_names(collections_names)在更新target_net参数时会用到
+            with tf.variable_scope('l2'):
+                w2 = tf.get_variable('w2', [n_l1, self.n_actions], initializer=w_initializer, collections=c_names)
+                b2 = tf.get_variable('b2', [1, self.n_actions], initializer=w_initializer, collections=c_names)
+                self.q_next = tf.matmul(l1, w2) + b2
+
+    def store_transition(self, s, a, r, s_):
+        if not hasattr(self, 'memory_counter'):
+            self.memory_counter = 0
+
+        # np.hstack() horison方向堆叠，即合并成一行
+        transition = np.hstack((s, [a, r], s_))
+
+        # replace the old memory with new memory
+        index = self.memory_counter % self.memory_size
+        self.memory[index, :] = transition
+
+        self.memory_counter += 1
+
+    def choose_action(self, observation):
+        # to have
